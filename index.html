@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  JANTRONICS S.A.S. — Landing page de energía solar fotovoltaica
+  ----------------------------------------------------------------------------
+  Archivo único: index.html  (HTML + CSS + JavaScript en el mismo archivo)
+  Autor de apoyo: material de clase para Análisis y Desarrollo de Software.
+
+  ¿Cómo está organizado este archivo? (guía rápida para estudiantes)
+    1) <head>      -> metadatos y TODO el CSS dentro de una etiqueta <style>.
+    2) <body>      -> el contenido visible, dividido por secciones semánticas:
+                      header / hero / servicios / blog+calculadora /
+                      formulario / footer.
+    3) <script>    -> al final, TODO el JavaScript (menú, calculadora y
+                      validación del formulario).
+
+  Regla del ejercicio: no se usan frameworks ni librerías externas.
+  Los íconos de redes sociales son SVG dibujados a mano dentro del HTML,
+  así el archivo funciona sin internet.
+  ============================================================================
+-->
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <!-- viewport: indispensable para que el diseño sea responsive en celular -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Jantronics S.A.S. — Proyectos de generación solar fotovoltaica On-Grid, Off-Grid e Híbridos para residencias, comercio, industria y sector público en Tolima." />
+  <title>Jantronics | Energía Solar Fotovoltaica</title>
+
+  <style>
+    /* ======================================================================
+       1. TOKENS DE DISEÑO (variables CSS)
+       ----------------------------------------------------------------------
+       Definir los colores y medidas UNA sola vez facilita mantener la marca.
+       Si Jantronics cambia un color, se cambia aquí y afecta toda la página.
+       Paleta Jantronics: azul marino (base), azul tech, verde solar y naranja.
+       ====================================================================== */
+    :root {
+      --marino:      #071a33;   /* azul marino profundo: fondo principal    */
+      --marino-2:    #0c2549;   /* azul marino secundario: tarjetas oscuras */
+      --azul:        #2e8be6;   /* azul tecnológico: acento y enlaces       */
+      --verde:       #2fbf71;   /* verde solar: energía / sostenibilidad    */
+      --naranja:     #ff8a1e;   /* naranja sol: llamados a la acción (CTA)  */
+      --claro:       #f4f7fb;   /* superficie clara: secciones sobre blanco */
+      --texto:       #0e1b2e;   /* texto sobre fondos claros                */
+      --texto-suave: #55627a;   /* texto secundario / descripciones         */
+      --blanco:      #ffffff;
+
+      --radio:   16px;                       /* redondeo estándar de tarjetas */
+      --sombra:  0 18px 40px rgba(7, 26, 51, .12);
+      --ancho:   1180px;                     /* ancho máximo del contenido    */
+
+      /* Una sola familia tipográfica, tomada de fuentes del sistema (sin
+         cargar nada externo). Arial es parte de la identidad de Jantronics. */
+      --fuente: "Segoe UI", Roboto, Arial, system-ui, -apple-system, sans-serif;
+    }
+
+    /* ======================================================================
+       2. RESET Y BASE
+       ====================================================================== */
+    * { margin: 0; padding: 0; box-sizing: border-box; } /* base uniforme */
+
+    html { scroll-behavior: smooth; }  /* desplazamiento suave del menú */
+
+    body {
+      font-family: var(--fuente);
+      color: var(--texto);
+      background: var(--blanco);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img, svg { display: block; max-width: 100%; }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* Contenedor centrado reutilizable: mantiene el contenido legible */
+    .contenedor {
+      width: 100%;
+      max-width: var(--ancho);
+      margin-inline: auto;
+      padding-inline: 20px;
+    }
+
+    /* Separación vertical estándar entre secciones */
+    section { padding-block: clamp(56px, 8vw, 96px); }
+
+    /* Título de sección reutilizable */
+    .titulo-seccion {
+      font-size: clamp(1.6rem, 3.5vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -.02em;      /* tracking cerrado = sensación tech */
+      line-height: 1.15;
+      max-width: 22ch;             /* controla el largo de línea del título */
+    }
+    .subtitulo-seccion {
+      color: var(--texto-suave);
+      margin-top: 12px;
+      max-width: 60ch;             /* menos de 80 caracteres por línea */
+    }
+
+    /* ---- Botones (estilos base + variantes de color) -------------------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 26px;
+      border: none;
+      border-radius: 999px;        /* forma de "píldora": look deportivo */
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+    .btn:active { transform: translateY(1px); }
+
+    .btn--naranja { background: var(--naranja); color: #3a1e00; }
+    .btn--naranja:hover { box-shadow: 0 10px 24px rgba(255, 138, 30, .45); }
+
+    .btn--azul { background: var(--azul); color: var(--blanco); }
+    .btn--azul:hover { box-shadow: 0 10px 24px rgba(46, 139, 230, .45); }
+
+    .btn--whatsapp { background: var(--verde); color: #03301a; }
+    .btn--whatsapp:hover { box-shadow: 0 10px 24px rgba(47, 191, 113, .45); }
+
+    /* Botón "fantasma": borde visible, fondo transparente */
+    .btn--linea {
+      background: transparent;
+      color: var(--blanco);
+      border: 1.5px solid rgba(255, 255, 255, .5);
+    }
+    .btn--linea:hover { border-color: var(--blanco); background: rgba(255,255,255,.08); }
+
+    /* ======================================================================
+       3. ENCABEZADO (header) + MENÚ
+       ====================================================================== */
+    .cabecera {
+      position: sticky;            /* el menú acompaña el scroll */
+      top: 0;
+      z-index: 50;
+      background: rgba(7, 26, 51, .92);
+      backdrop-filter: blur(8px);  /* efecto vidrio esmerilado */
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+    }
+    .cabecera__interno {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    /* Logo textual (nombre de la empresa) con un pequeño ícono de sol SVG */
+    .logo { display: flex; align-items: center; gap: 10px; color: var(--blanco); }
+    .logo__marca { font-size: 1.35rem; font-weight: 800; letter-spacing: -.02em; }
+    .logo__marca span { color: var(--naranja); } /* punto de color de marca */
+
+    /* Navegación */
+    .nav { display: flex; align-items: center; gap: 8px; }
+    .nav a {
+      color: rgba(255, 255, 255, .82);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-weight: 600;
+      transition: color .15s ease, background .15s ease;
+    }
+    .nav a:hover { color: var(--blanco); background: rgba(255, 255, 255, .1); }
+
+    /* Botón "hamburguesa" para el menú en celular (oculto en escritorio) */
+    .menu-btn {
+      display: none;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+    }
+    .menu-btn span {
+      display: block;
+      width: 26px;
+      height: 3px;
+      margin: 5px 0;
+      background: var(--blanco);
+      border-radius: 3px;
+    }
+
+    /* ======================================================================
+       4. HERO (sección principal)
+       ----------------------------------------------------------------------
+       Elemento memorable de la página: la frase de marca sobre un fondo
+       azul marino con un "resplandor de sol" (radial) en la esquina, que
+       evoca el recurso natural con el que trabaja Jantronics.
+       ====================================================================== */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background: var(--marino);
+      color: var(--blanco);
+      isolation: isolate;          /* aísla las capas de fondo */
+    }
+    /* Capa 1: resplandor de sol (radiales naranja/azul) */
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background:
+        radial-gradient(560px 560px at 88% -10%, rgba(255, 138, 30, .35), transparent 60%),
+        radial-gradient(700px 500px at 10% 120%, rgba(46, 139, 230, .30), transparent 60%);
+    }
+    /* Capa 2: rejilla tenue tipo "tecnológico" (líneas de energía) */
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background-image:
+        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,.8), transparent 75%);
+    }
+
+    .hero__interno {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 40px;
+      align-items: center;
+      padding-block: clamp(64px, 10vw, 120px);
+    }
+
+    /* Etiqueta superior discreta (sensación de servicio especializado) */
+    .hero__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(47, 191, 113, .15);
+      color: #baf2d4;
+      border: 1px solid rgba(47, 191, 113, .4);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: .9rem;
+    }
+
+    /* La FRASE de marca: es el corazón visual de la página */
+    .hero__frase {
+      font-size: clamp(1.9rem, 4.6vw, 3.4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+      margin-top: 20px;
+      text-wrap: balance;          /* reparte el texto en líneas parejas */
+    }
+    .hero__apoyo {
+      color: rgba(255, 255, 255, .78);
+      font-size: 1.1rem;
+      margin-top: 18px;
+      max-width: 52ch;
+    }
+    .hero__acciones { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 30px; }
+
+    /* Tarjeta lateral con "métricas" de energía (aporta el aire deportivo) */
+    .hero__panel {
+      background: linear-gradient(160deg, var(--marino-2), rgba(12, 37, 73, .3));
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 22px;
+      padding: 28px;
+      display: grid;
+      gap: 18px;
+      box-shadow: var(--sombra);
+    }
+    .metrica { display: flex; align-items: baseline; gap: 10px; }
+    .metrica b { font-size: 2rem; color: var(--naranja); line-height: 1; }
+    .metrica small { color: rgba(255,255,255,.7); font-size: .95rem; }
+    .hero__panel .linea { height: 1px; background: rgba(255,255,255,.1); }
+
+    /* ======================================================================
+       5. SERVICIOS (3 tarjetas + botón de WhatsApp)
+       ====================================================================== */
+    .servicios { background: var(--claro); }
+    .cabecera-seccion { text-align: center; display: grid; justify-items: center; }
+
+    .grid-servicios {
+      margin-top: 44px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .tarjeta {
+      background: var(--blanco);
+      border: 1px solid #e4eaf3;
+      border-radius: var(--radio);
+      padding: 30px 26px;
+      box-shadow: 0 6px 18px rgba(7, 26, 51, .05);
+      /* La transición de hover comunica que la tarjeta es interactiva */
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .tarjeta:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--sombra);
+      border-color: var(--azul);
+    }
+    /* Ícono circular de la tarjeta; cada servicio usa un color de marca */
+    .tarjeta__icono {
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      display: grid; place-items: center;
+      color: var(--blanco);
+      margin-bottom: 18px;
+    }
+    .ico-azul   { background: linear-gradient(135deg, var(--azul), #1c6fc0); }
+    .ico-verde  { background: linear-gradient(135deg, var(--verde), #1f9a58); }
+    .ico-naranja{ background: linear-gradient(135deg, var(--naranja), #e0730c); }
+
+    .tarjeta h3 { font-size: 1.3rem; letter-spacing: -.01em; }
+    .tarjeta p  { color: var(--texto-suave); margin-top: 10px; }
+    .tarjeta ul { list-style: none; margin-top: 16px; display: grid; gap: 8px; }
+    .tarjeta li { display: flex; gap: 10px; align-items: flex-start; font-size: .96rem; }
+    .tarjeta li::before {
+      content: "✓";
+      color: var(--verde);
+      font-weight: 800;
+    }
+
+    /* Franja con el botón de WhatsApp debajo de las tarjetas */
+    .franja-whatsapp {
+      margin-top: 40px;
+      background: var(--marino);
+      color: var(--blanco);
+      border-radius: var(--radio);
+      padding: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .franja-whatsapp p { max-width: 46ch; color: rgba(255,255,255,.85); }
+    .franja-whatsapp strong { color: var(--blanco); }
+
+    /* ======================================================================
+       6. BLOG + CALCULADORA SOLAR (dos columnas)
+       ====================================================================== */
+    .grid-blog-calc {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+
+    /* --- Blog: lista de artículos simulados --- */
+    .articulo {
+      display: grid;
+      gap: 6px;
+      padding: 20px;
+      border: 1px solid #e4eaf3;
+      border-radius: 14px;
+      margin-bottom: 16px;
+      transition: border-color .15s ease, background .15s ease;
+    }
+    .articulo:hover { border-color: var(--azul); background: #fbfdff; }
+    .articulo .fecha { color: var(--azul); font-weight: 700; font-size: .82rem; }
+    .articulo h4 { font-size: 1.1rem; }
+    .articulo p  { color: var(--texto-suave); font-size: .95rem; }
+    .articulo a  { color: var(--azul); font-weight: 700; font-size: .9rem; margin-top: 4px; }
+
+    /* --- Calculadora solar: tarjeta con entrada y resultados --- */
+    .calc {
+      background: var(--marino);
+      color: var(--blanco);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: var(--sombra);
+    }
+    .calc h3 { font-size: 1.4rem; }
+    .calc p.ayuda { color: rgba(255,255,255,.7); font-size: .95rem; margin-top: 6px; }
+
+    .campo-calc { margin-top: 20px; }
+    .campo-calc label { display: block; font-weight: 600; margin-bottom: 8px; font-size: .95rem; }
+    .campo-calc input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      color: var(--blanco);
+      font: inherit;
+    }
+    .campo-calc input::placeholder { color: rgba(255,255,255,.45); }
+    .campo-calc input:focus { outline: 2px solid var(--naranja); }
+
+    /* Caja de resultados de la calculadora */
+    .resultados {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .resultado {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .resultado span { display: block; color: rgba(255,255,255,.7); font-size: .82rem; }
+    .resultado b { font-size: 1.5rem; color: var(--verde); }
+    .nota-calc { font-size: .8rem; color: rgba(255,255,255,.55); margin-top: 16px; }
+
+    /* ======================================================================
+       7. FORMULARIO DE CONTACTO
+       ====================================================================== */
+    .contacto { background: var(--claro); }
+    .form-tarjeta {
+      max-width: 620px;
+      margin: 40px auto 0;
+      background: var(--blanco);
+      border: 1px solid #e4eaf3;
+      border-radius: 20px;
+      padding: clamp(24px, 4vw, 40px);
+      box-shadow: var(--sombra);
+    }
+    .campo { margin-bottom: 18px; }
+    .campo label { display: block; font-weight: 600; margin-bottom: 8px; }
+    .campo input, .campo select {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #cfd8e6;
+      border-radius: 12px;
+      font: inherit;
+      color: var(--texto);
+      background: var(--blanco);
+    }
+    .campo input:focus, .campo select:focus { outline: 2px solid var(--azul); border-color: var(--azul); }
+
+    /* Mensaje de confirmación en pantalla (oculto por defecto) */
+    .mensaje-ok {
+      display: none;                 /* JS lo cambia a "block" al enviar */
+      margin-top: 20px;
+      background: rgba(47, 191, 113, .12);
+      border: 1px solid var(--verde);
+      color: #15703f;
+      border-radius: 12px;
+      padding: 16px 18px;
+      font-weight: 600;
+      text-align: center;
+    }
+    .mensaje-ok.visible { display: block; }
+
+    /* ======================================================================
+       8. PIE DE PÁGINA (footer)
+       ====================================================================== */
+    .pie { background: var(--marino); color: rgba(255,255,255,.8); }
+    .pie__grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 32px;
+      padding-block: 56px 28px;
+    }
+    .pie h5 { color: var(--blanco); font-size: 1rem; margin-bottom: 14px; letter-spacing: -.01em; }
+    .pie ul { list-style: none; display: grid; gap: 8px; }
+    .pie a:hover { color: var(--blanco); }
+
+    /* Botones de redes sociales (íconos SVG) */
+    .redes { display: flex; gap: 12px; margin-top: 16px; }
+    .red {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: grid; place-items: center;
+      background: rgba(255,255,255,.08);
+      color: var(--blanco);
+      border: 1px solid rgba(255,255,255,.12);
+      transition: transform .15s ease, background .15s ease;
+    }
+    .red:hover { transform: translateY(-3px); }
+    .red--fb:hover { background: #1877f2; }
+    .red--ig:hover { background: #d62976; }
+    .red--in:hover { background: #0a66c2; }
+
+    .pie__base {
+      border-top: 1px solid rgba(255,255,255,.1);
+      padding-block: 20px;
+      text-align: center;
+      font-size: .88rem;
+      color: rgba(255,255,255,.6);
+    }
+
+    /* ======================================================================
+       9. RESPONSIVE (media queries)
+       ----------------------------------------------------------------------
+       A menor ancho de pantalla, las rejillas de varias columnas pasan a una
+       sola columna y aparece el menú tipo "hamburguesa".
+       ====================================================================== */
+    @media (max-width: 900px) {
+      .hero__interno { grid-template-columns: 1fr; }
+      .hero__panel { order: -1; }           /* el panel va arriba en móvil */
+      .grid-servicios { grid-template-columns: 1fr; }
+      .grid-blog-calc { grid-template-columns: 1fr; }
+      .pie__grid { grid-template-columns: 1fr; }
+
+      /* Se muestra el botón hamburguesa y se oculta el menú horizontal */
+      .menu-btn { display: block; }
+      .nav {
+        position: absolute;
+        top: 72px; left: 0; right: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+        background: var(--marino);
+        padding: 12px 20px 20px;
+        border-bottom: 1px solid rgba(255,255,255,.1);
+        display: none;                       /* JS alterna esta clase */
+      }
+      .nav.abierto { display: flex; }
+    }
+
+    @media (max-width: 520px) {
+      .resultados { grid-template-columns: 1fr; }
+      .franja-whatsapp { flex-direction: column; align-items: flex-start; }
+    }
+
+    /* Respeta a las personas que prefieren menos animación */
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; scroll-behavior: auto; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ========================================================================
+       ENCABEZADO: nombre de la empresa + menú simple
+       ===================================================================== -->
+  <header class="cabecera">
+    <div class="contenedor cabecera__interno">
+
+      <!-- Logo = ícono de sol (SVG) + nombre de la empresa -->
+      <a class="logo" href="#inicio" aria-label="Jantronics - inicio">
+        <!-- Sol estilizado dibujado con SVG (sin imágenes externas) -->
+        <svg width="34" height="34" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <circle cx="24" cy="24" r="9" fill="#ff8a1e"/>
+          <g stroke="#2fbf71" stroke-width="3" stroke-linecap="round">
+            <path d="M24 4v6M24 38v6M4 24h6M38 24h6"/>
+            <path d="M10 10l4 4M34 34l4 4M38 10l-4 4M14 34l-4 4"/>
+          </g>
+        </svg>
+        <span class="logo__marca">Jan<span>tronics</span></span>
+      </a>
+
+      <!-- Menú de navegación (los enlaces apuntan a los id de cada sección) -->
+      <nav class="nav" id="menu">
+        <a href="#inicio">Inicio</a>
+        <a href="#servicios">Servicios</a>
+        <a href="#blog">Blog</a>
+        <a href="#calculadora">Calculadora</a>
+        <a href="#contacto">Contacto</a>
+      </nav>
+
+      <!-- Botón hamburguesa: solo visible en celular. onclick llama a la
+           función alternarMenu() definida en el <script> del final. -->
+      <button class="menu-btn" onclick="alternarMenu()" aria-label="Abrir menú" aria-expanded="false" id="btnMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       HERO: frase principal de marca
+       ===================================================================== -->
+  <section class="hero" id="inicio">
+    <div class="contenedor hero__interno">
+
+      <!-- Columna de texto -->
+      <div>
+        <span class="hero__badge">● Energía solar fotovoltaica en Tolima</span>
+
+        <!-- FRASE solicitada, tal cual, como protagonista de la página -->
+        <h1 class="hero__frase">
+          Transformamos la energía que nos brinda el sol en ahorro y
+          sostenibilidad, haz parte del cambio que el planeta necesita.
+        </h1>
+
+        <p class="hero__apoyo">
+          Diseñamos e instalamos proyectos de generación solar On-Grid,
+          Off-Grid e Híbridos para residencias, comercio, industria y
+          sector público.
+        </p>
+
+        <div class="hero__acciones">
+          <a class="btn btn--naranja" href="#contacto">Cotiza tu proyecto</a>
+          <a class="btn btn--linea" href="#calculadora">Calcula tu ahorro</a>
+        </div>
+      </div>
+
+      <!-- Columna lateral: panel con cifras (aporta el aire técnico/deportivo) -->
+      <aside class="hero__panel" aria-label="Indicadores de Jantronics">
+        <div class="metrica"><b>-70%</b><small>en tu factura de energía</small></div>
+        <div class="linea"></div>
+        <div class="metrica"><b>25 años</b><small>de vida útil de los módulos</small></div>
+        <div class="linea"></div>
+        <div class="metrica"><b>RETIE</b><small>diseños que cumplen la norma</small></div>
+        <div class="linea"></div>
+        <div class="metrica"><b>3 en 1</b><small>On-Grid · Off-Grid · Híbrido</small></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       SERVICIOS: 3 tarjetas + botón de WhatsApp
+       ===================================================================== -->
+  <section class="servicios" id="servicios">
+    <div class="contenedor">
+
+      <div class="cabecera-seccion">
+        <h2 class="titulo-seccion">Soluciones solares a la medida</h2>
+        <p class="subtitulo-seccion">
+          Elegimos la topología ideal según tu consumo, tu conexión a la red
+          y tus metas de ahorro y respaldo.
+        </p>
+      </div>
+
+      <div class="grid-servicios">
+
+        <!-- Tarjeta 1: On-Grid -->
+        <article class="tarjeta">
+          <div class="tarjeta__icono ico-azul">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
+            </svg>
+          </div>
+          <h3>Sistemas On-Grid</h3>
+          <p>Conectados a la red. Inyecta excedentes y reduce tu factura al máximo.</p>
+          <ul>
+            <li>Mayor retorno de inversión</li>
+            <li>Compensación de excedentes (AGPE)</li>
+            <li>Sin baterías: menor costo inicial</li>
+          </ul>
+        </article>
+
+        <!-- Tarjeta 2: Off-Grid -->
+        <article class="tarjeta">
+          <div class="tarjeta__icono ico-verde">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="4" y="7" width="16" height="12" rx="2"/>
+              <path d="M9 11h6M9 15h6M9 3v4M15 3v4"/>
+            </svg>
+          </div>
+          <h3>Sistemas Off-Grid</h3>
+          <p>Autónomos con baterías. Ideales para zonas sin red o de servicio inestable.</p>
+          <ul>
+            <li>Independencia total de la red</li>
+            <li>Respaldo con banco de baterías</li>
+            <li>Perfecto para fincas y sitios remotos</li>
+          </ul>
+        </article>
+
+        <!-- Tarjeta 3: Híbrido -->
+        <article class="tarjeta">
+          <div class="tarjeta__icono ico-naranja">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3v18M4 8l8-5 8 5M4 16l8 5 8-5"/>
+            </svg>
+          </div>
+          <h3>Sistemas Híbridos</h3>
+          <p>Lo mejor de ambos mundos: ahorro con la red y respaldo con baterías.</p>
+          <ul>
+            <li>Energía aunque se vaya la luz</li>
+            <li>Gestión inteligente del consumo</li>
+            <li>Escalable a futuro</li>
+          </ul>
+        </article>
+      </div>
+
+      <!-- Franja con botón de WhatsApp para contacto rápido -->
+      <div class="franja-whatsapp">
+        <p><strong>¿No sabes cuál sistema te conviene?</strong> Escríbenos y un
+           asesor te guía sin costo para elegir la mejor opción.</p>
+        <!-- wa.me abre WhatsApp con un mensaje prellenado. Cambia el número
+             57314XXXXXXX por el número real de Jantronics. -->
+        <a class="btn btn--whatsapp"
+           href="https://wa.me/573140000000?text=Hola%20Jantronics%2C%20quiero%20informaci%C3%B3n%20sobre%20un%20sistema%20solar."
+           target="_blank" rel="noopener">
+          <!-- Ícono SVG de WhatsApp -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.9-4.45 9.9-9.91C21.95 6.45 17.5 2 12.04 2zm0 18.05a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.24-8.23 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.69 8.23-8.24 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.25-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.39.11-.51.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.42l-.48-.01c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.11-.22-.17-.47-.29z"/>
+          </svg>
+          Escríbenos por WhatsApp
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       BLOG + CALCULADORA SOLAR
+       ===================================================================== -->
+  <section id="blog">
+    <div class="contenedor">
+      <div class="grid-blog-calc">
+
+        <!-- Columna izquierda: Blog (artículos simulados) -->
+        <div>
+          <h2 class="titulo-seccion">Blog solar</h2>
+          <p class="subtitulo-seccion">Aprende a sacarle el máximo provecho al sol.</p>
+
+          <div style="margin-top:28px">
+            <article class="articulo">
+              <span class="fecha">15 AGO 2026</span>
+              <h4>¿Conviene más el sol que un CDT?</h4>
+              <p>Comparamos la rentabilidad de invertir en energía solar frente a un CDT tradicional.</p>
+              <a href="#">Leer artículo →</a>
+            </article>
+
+            <article class="articulo">
+              <span class="fecha">02 AGO 2026</span>
+              <h4>On-Grid vs. Híbrido: ¿cuál elegir?</h4>
+              <p>Guía práctica para decidir según tu consumo y la estabilidad de tu red eléctrica.</p>
+              <a href="#">Leer artículo →</a>
+            </article>
+
+            <article class="articulo">
+              <span class="fecha">21 JUL 2026</span>
+              <h4>AGPE en Colombia: paso a paso</h4>
+              <p>Todo sobre la autogeneración a pequeña escala y la compensación de excedentes.</p>
+              <a href="#">Leer artículo →</a>
+            </article>
+          </div>
+        </div>
+
+        <!-- Columna derecha: Calculadora solar interactiva -->
+        <div id="calculadora">
+          <div class="calc">
+            <h3>Calculadora solar</h3>
+            <p class="ayuda">Estima el tamaño de tu sistema y tu ahorro a partir de tu consumo mensual.</p>
+
+            <div class="campo-calc">
+              <label for="consumo">Consumo mensual (kWh)</label>
+              <!-- oninput: recalcula en tiempo real mientras el usuario escribe -->
+              <input type="number" id="consumo" min="0" placeholder="Ej: 350" oninput="calcularSolar()">
+            </div>
+
+            <!-- Resultados; el JavaScript actualiza el contenido de los <b> -->
+            <div class="resultados">
+              <div class="resultado">
+                <span>Potencia estimada</span>
+                <b id="resKwp">— kWp</b>
+              </div>
+              <div class="resultado">
+                <span>N.º de paneles</span>
+                <b id="resPaneles">—</b>
+              </div>
+              <div class="resultado">
+                <span>Ahorro mensual</span>
+                <b id="resMes">—</b>
+              </div>
+              <div class="resultado">
+                <span>Ahorro anual</span>
+                <b id="resAnio">—</b>
+              </div>
+            </div>
+
+            <p class="nota-calc">
+              *Cálculo referencial. Supone 4,5 horas de sol pico (Ibagué),
+              rendimiento del 80%, panel de 585 W y tarifa de $900/kWh.
+              La cifra real depende del diseño y de tu recibo.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       FORMULARIO DE CONTACTO (simulado)
+       ===================================================================== -->
+  <section class="contacto" id="contacto">
+    <div class="contenedor">
+      <div class="cabecera-seccion">
+        <h2 class="titulo-seccion">Solicita información</h2>
+        <p class="subtitulo-seccion">
+          Déjanos tus datos y un asesor de Jantronics te contactará.
+        </p>
+      </div>
+
+      <!--
+        Usamos un <div>, no un <form> con envío real, porque es una simulación
+        y el objetivo es practicar la validación con JavaScript.
+      -->
+      <div class="form-tarjeta">
+
+        <div class="campo">
+          <label for="nombre">Nombre completo</label>
+          <input type="text" id="nombre" placeholder="Ej: Óscar Pérez">
+        </div>
+
+        <div class="campo">
+          <label for="correo">Correo electrónico</label>
+          <input type="email" id="correo" placeholder="Ej: nombre@correo.com">
+        </div>
+
+        <div class="campo">
+          <label for="plan">Plan de interés</label>
+          <select id="plan">
+            <option value="On-Grid">Sistema On-Grid</option>
+            <option value="Off-Grid">Sistema Off-Grid</option>
+            <option value="Híbrido">Sistema Híbrido</option>
+            <option value="No estoy seguro">No estoy seguro / Asesoría</option>
+          </select>
+        </div>
+
+        <!-- REQUISITO 6: botón interactivo que muestra un mensaje al hacer clic.
+             onclick llama a enviarSolicitud(), que valida y muestra el mensaje. -->
+        <button class="btn btn--azul" style="width:100%; justify-content:center"
+                onclick="enviarSolicitud()">
+          Enviar solicitud
+        </button>
+
+        <!-- Mensaje de confirmación en pantalla (aparece si la validación pasa).
+             role="status" avisa a lectores de pantalla del cambio. -->
+        <div class="mensaje-ok" id="mensajeOk" role="status"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       PIE DE PÁGINA: datos de contacto (simulados) + redes sociales
+       ===================================================================== -->
+  <footer class="pie">
+    <div class="contenedor">
+      <div class="pie__grid">
+
+        <!-- Columna 1: marca + redes -->
+        <div>
+          <div class="logo" style="margin-bottom:10px">
+            <svg width="30" height="30" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+              <circle cx="24" cy="24" r="9" fill="#ff8a1e"/>
+              <g stroke="#2fbf71" stroke-width="3" stroke-linecap="round">
+                <path d="M24 4v6M24 38v6M4 24h6M38 24h6"/>
+                <path d="M10 10l4 4M34 34l4 4M38 10l-4 4M14 34l-4 4"/>
+              </g>
+            </svg>
+            <span class="logo__marca">Jan<span>tronics</span></span>
+          </div>
+          <p style="max-width:34ch">
+            Energía solar fotovoltaica para residencias, comercio, industria y
+            sector público en el Tolima.
+          </p>
+
+          <!-- Botones de redes sociales (íconos SVG, enlaces simulados) -->
+          <div class="redes">
+            <a class="red red--fb" href="#" target="_blank" rel="noopener" aria-label="Facebook">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z"/>
+              </svg>
+            </a>
+            <a class="red red--ig" href="#" target="_blank" rel="noopener" aria-label="Instagram">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="5"/>
+                <circle cx="12" cy="12" r="4"/>
+                <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/>
+              </svg>
+            </a>
+            <a class="red red--in" href="#" target="_blank" rel="noopener" aria-label="LinkedIn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M4.98 3.5A2.5 2.5 0 1 0 5 8.5a2.5 2.5 0 0 0-.02-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05C20.6 8.65 22 10.9 22 14.3V21h-4v-5.9c0-1.4-.03-3.2-1.95-3.2-1.95 0-2.25 1.52-2.25 3.1V21H9z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Columna 2: contacto simulado -->
+        <div>
+          <h5>Contacto</h5>
+          <ul>
+            <li>Ibagué, Tolima — Colombia</li>
+            <li><a href="tel:+573140000000">+57 314 000 0000</a></li>
+            <li><a href="mailto:contacto@jantronicscol.com">contacto@jantronicscol.com</a></li>
+            <li><a href="https://www.jantronicscol.com" target="_blank" rel="noopener">www.jantronicscol.com</a></li>
+          </ul>
+        </div>
+
+        <!-- Columna 3: enlaces rápidos -->
+        <div>
+          <h5>Enlaces</h5>
+          <ul>
+            <li><a href="#servicios">Servicios</a></li>
+            <li><a href="#blog">Blog</a></li>
+            <li><a href="#calculadora">Calculadora solar</a></li>
+            <li><a href="#contacto">Solicitar información</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pie__base">
+        © 2026 Jantronics S.A.S. — Todos los derechos reservados. (Datos de contacto de ejemplo)
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================================
+       JAVASCRIPT (toda la lógica al final del <body>)
+       Colocarlo al final asegura que el HTML ya existe cuando el JS se ejecuta.
+       ===================================================================== -->
+  <script>
+    /* --------------------------------------------------------------------
+       A) MENÚ RESPONSIVE
+       Alterna la clase "abierto" del menú en pantallas pequeñas.
+       -------------------------------------------------------------------- */
+    function alternarMenu() {
+      var menu = document.getElementById("menu");
+      var btn  = document.getElementById("btnMenu");
+      menu.classList.toggle("abierto");
+      // Actualiza el atributo de accesibilidad según el estado del menú
+      var abierto = menu.classList.contains("abierto");
+      btn.setAttribute("aria-expanded", abierto ? "true" : "false");
+    }
+
+    // Al hacer clic en un enlace del menú, se cierra (mejor experiencia móvil)
+    document.querySelectorAll("#menu a").forEach(function (enlace) {
+      enlace.addEventListener("click", function () {
+        document.getElementById("menu").classList.remove("abierto");
+      });
+    });
+
+    /* --------------------------------------------------------------------
+       B) CALCULADORA SOLAR
+       Estima potencia (kWp), número de paneles y ahorro a partir del
+       consumo mensual en kWh. Son fórmulas simplificadas y didácticas.
+       -------------------------------------------------------------------- */
+    function calcularSolar() {
+      // 1) Leer el valor escrito y convertirlo a número
+      var consumo = parseFloat(document.getElementById("consumo").value);
+
+      // Referencias a los elementos donde mostraremos los resultados
+      var resKwp     = document.getElementById("resKwp");
+      var resPaneles = document.getElementById("resPaneles");
+      var resMes     = document.getElementById("resMes");
+      var resAnio    = document.getElementById("resAnio");
+
+      // 2) Si no hay un número válido y positivo, mostrar guiones y salir
+      if (isNaN(consumo) || consumo <= 0) {
+        resKwp.textContent = "— kWp";
+        resPaneles.textContent = "—";
+        resMes.textContent = "—";
+        resAnio.textContent = "—";
+        return;
+      }
+
+      // 3) Constantes de diseño (valores de referencia para Ibagué)
+      var HSP        = 4.5;    // horas de sol pico promedio al día
+      var RENDIMIENTO= 0.8;    // pérdidas del sistema (80% aprovechable)
+      var POT_PANEL  = 585;    // potencia de un panel en vatios (W)
+      var TARIFA     = 900;    // costo aproximado del kWh en pesos (COP)
+
+      // 4) Cálculos
+      // Potencia necesaria (kWp) = consumo mensual / energía que genera 1 kWp al mes
+      var kwp = consumo / (30 * HSP * RENDIMIENTO);
+      // Número de paneles = potencia total / potencia por panel (redondeado hacia arriba)
+      var paneles = Math.ceil((kwp * 1000) / POT_PANEL);
+      // Ahorro: asumimos que el sistema cubre el consumo mensual
+      var ahorroMes  = consumo * TARIFA;
+      var ahorroAnio = ahorroMes * 12;
+
+      // 5) Formateador de moneda colombiana (ej: $315.000)
+      var pesos = new Intl.NumberFormat("es-CO", {
+        style: "currency", currency: "COP", maximumFractionDigits: 0
+      });
+
+      // 6) Mostrar resultados en pantalla
+      resKwp.textContent     = kwp.toFixed(2) + " kWp";
+      resPaneles.textContent = paneles + " paneles";
+      resMes.textContent     = pesos.format(ahorroMes);
+      resAnio.textContent    = pesos.format(ahorroAnio);
+    }
+
+    /* --------------------------------------------------------------------
+       C) VALIDACIÓN DEL FORMULARIO
+       Requisito: si nombre o correo están vacíos -> alerta.
+                  si están completos -> mensaje de confirmación en pantalla.
+       -------------------------------------------------------------------- */
+    function enviarSolicitud() {
+      // 1) Leer los valores y quitar espacios sobrantes con trim()
+      var nombre = document.getElementById("nombre").value.trim();
+      var correo = document.getElementById("correo").value.trim();
+      var plan   = document.getElementById("plan").value;
+      var mensaje= document.getElementById("mensajeOk");
+
+      // 2) Validación principal: campos obligatorios vacíos -> ALERTA
+      if (nombre === "" || correo === "") {
+        alert("Por favor completa tu nombre y correo antes de enviar la solicitud.");
+        return; // detiene la función: no muestra el mensaje de éxito
+      }
+
+      // 3) Validación adicional (bonus): formato básico de correo con expresión
+      //    regular. Si el correo no tiene forma de email, avisamos con alerta.
+      var formatoCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!formatoCorreo.test(correo)) {
+        alert("El correo no parece válido. Revisa que tenga el formato nombre@correo.com");
+        return;
+      }
+
+      // 4) Todo correcto -> mostrar el mensaje de confirmación EN PANTALLA
+      mensaje.textContent =
+        "Solicitud enviada correctamente. Un asesor se comunicará contigo.";
+      mensaje.classList.add("visible");
+
+      // 5) Opcional: limpiar los campos tras el envío simulado
+      document.getElementById("nombre").value = "";
+      document.getElementById("correo").value = "";
+
+      // 6) Llevar la vista al mensaje para que el usuario lo vea
+      mensaje.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  </script>
+</body>
+</html>
